@@ -1,0 +1,43 @@
+{
+  "name": "hereldar/character-encodings",
+  "type": "library",
+  "description": "...",
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/hereldar/php-character-encodings/issues",
+    "source": "https://github.com/hereldar/php-character-encodings"
+  },
+  "authors": [
+    {
+      "name": "Samuel Maudo",
+      "email": "samuelmaudo@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^8.0",
+    "ext-intl": "*",
+    "ext-mbstring": "*",
+    "ext-pcre": "*",
+    "symfony/polyfill-php81": "^1.22"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.4",
+    "symfony/console": "^5.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hereldar\\CharacterEncodings\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Hereldar\\CharacterEncodings\\Commands\\": "bin/",
+      "Hereldar\\CharacterEncodings\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
