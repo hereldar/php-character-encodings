@@ -2,6 +2,7 @@
   "name": "hereldar/character-encodings",
   "type": "library",
   "description": "...",
+  "keywords": [],
   "license": "MIT",
   "support": {
     "issues": "https://github.com/hereldar/php-character-encodings/issues",
@@ -10,19 +11,19 @@
   "authors": [
     {
       "name": "Samuel Maudo",
-      "email": "samuelmaudo@gmail.com"
+      "email": "samuelmaudo@gmail.com",
+      "homepage": "https://github.com/samuelmaudo"
     }
   ],
   "require": {
-    "php": "^8.0",
+    "php": "^8.1.17|^8.2.4",
     "ext-intl": "*",
     "ext-mbstring": "*",
-    "ext-pcre": "*",
-    "symfony/polyfill-php81": "^1.22"
+    "ext-pcre": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.4",
-    "symfony/console": "^5.3"
+    "phpunit/phpunit": "^10.1",
+    "symfony/console": "^6.3"
   },
   "autoload": {
     "psr-4": {
@@ -36,8 +37,25 @@
     }
   },
   "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
     "sort-packages": true
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "scripts": {
+    "phpcs": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix -v --diff --dry-run",
+    "phpstan": "tools/phpstan/vendor/bin/phpstan analyse --configuration phpstan.neon",
+    "phpunit": "vendor/bin/phpunit",
+    "psalm": "tools/psalm/vendor/bin/psalm --no-cache",
+    "code-quality": [
+      "@phpcs",
+      "@phpstan",
+      "@psalm"
+    ],
+    "test": [
+      "@phpunit",
+      "@code-quality"
+    ]
+  }
 }
