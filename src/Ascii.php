@@ -17,7 +17,7 @@ use UnexpectedValueException;
 /**
  * @see https://en.wikipedia.org/wiki/ASCII
  */
-class Ascii extends AbstractEncoding
+class Ascii extends CharacterEncoding
 {
     use IsAsciiCompatible;
     use IsSingleByte;

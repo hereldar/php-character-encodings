@@ -15,7 +15,7 @@ use UnexpectedValueException;
  * @see https://doc.qt.io/qt-6/qchar.html#public-types
  * @see https://doc.qt.io/qt-6/qstring.html#public-types
  */
-class Utf8 extends AbstractEncoding
+class Utf8 extends CharacterEncoding
 {
     use IsAsciiCompatible;
     use IsSelfSynchronized;

@@ -17,7 +17,7 @@ use UnexpectedValueException;
 /**
  * @see https://en.wikipedia.org/wiki/Windows-1252
  */
-class Windows1252 extends AbstractEncoding
+class Windows1252 extends CharacterEncoding
 {
     use IsAsciiCompatible;
     use IsSingleByte;
