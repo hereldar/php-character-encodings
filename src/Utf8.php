@@ -6,7 +6,6 @@ use Hereldar\CharacterEncodings\Traits\IsAsciiCompatible;
 use Hereldar\CharacterEncodings\Traits\IsSelfSynchronized;
 use Hereldar\CharacterEncodings\Traits\IsUnicode;
 use Hereldar\CharacterEncodings\Traits\IsVariableWidth;
-
 use IntlChar;
 use UnexpectedValueException;
 

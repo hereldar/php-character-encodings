@@ -3,7 +3,6 @@
 namespace Hereldar\CharacterEncodings;
 
 use Hereldar\CharacterEncodings\Enums\Category;
-
 use UnexpectedValueException;
 
 abstract class AbstractEncoding implements IEncoding
@@ -12,7 +11,6 @@ abstract class AbstractEncoding implements IEncoding
 
     private function __construct()
     {
-        //
     }
 
     public function __toString(): string
@@ -28,7 +26,7 @@ abstract class AbstractEncoding implements IEncoding
             return self::$instances[$class];
         }
 
-        return (self::$instances[$class] = new static());
+        return self::$instances[$class] = new static();
     }
 
     public function isAsciiCompatible(): bool
@@ -462,6 +460,7 @@ abstract class AbstractEncoding implements IEncoding
 
         if ($this->isAsciiCompatible()) {
             $ascii = Ascii::encoding();
+
             if ($ascii->codeIsValid($codepoint)) {
                 return $ascii->codeIsWhitespace($codepoint);
             }
