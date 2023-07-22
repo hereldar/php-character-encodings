@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hereldar\CharacterEncodings;
 
 use Hereldar\CharacterEncodings\Enums\Category;
 use UnexpectedValueException;
 
 /**
+ * @psalm-consistent-constructor
+ *
  * @see https://encoding.spec.whatwg.org/
  * @see https://en.wikipedia.org/wiki/Unicode_character_property
  * @see https://www.php.net/manual/en/class.intlchar.php
@@ -690,13 +694,5 @@ abstract class CharacterEncoding
         }
 
         return (Category::SPACE_SEPARATOR === $this->codeCategory($codepoint));
-    }
-
-    public function validateCode(int $codepoint): void
-    {
-        if ($codepoint < $this->minCodepoint()
-            || $codepoint > $this->maxCodepoint()) {
-            throw new UnexpectedValueException();
-        }
     }
 }

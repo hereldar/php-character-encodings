@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hereldar\CharacterEncodings;
 
+use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
+use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Traits\IsAsciiCompatible;
 use Hereldar\CharacterEncodings\Traits\IsSelfSynchronized;
 use Hereldar\CharacterEncodings\Traits\IsUnicode;
 use Hereldar\CharacterEncodings\Traits\IsVariableWidth;
 use IntlChar;
-use UnexpectedValueException;
 
 /**
  * @see https://en.wikipedia.org/wiki/Unicode
@@ -48,17 +51,21 @@ class Utf8 extends CharacterEncoding
 
     public function char(int $codepoint): string
     {
-        $this->validateCode($codepoint);
+        $character = IntlChar::chr($codepoint);
 
-        return IntlChar::chr($codepoint);
+        if (null === $character) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return $character;
     }
 
     public function charCategory(string $character): int
     {
         $category = IntlChar::charType($character);
 
-        if (!$category) {
-            throw new UnexpectedValueException();
+        if (null === $category) {
+            throw new InvalidCharacter($this, $character);
         }
 
         return $category;
@@ -68,8 +75,8 @@ class Utf8 extends CharacterEncoding
     {
         $direction = IntlChar::charDirection($character);
 
-        if (!$direction) {
-            throw new UnexpectedValueException();
+        if (null === $direction) {
+            throw new InvalidCharacter($this, $character);
         }
 
         return $direction;
@@ -79,8 +86,8 @@ class Utf8 extends CharacterEncoding
     {
         $name = IntlChar::charName($character);
 
-        if (!$name) {
-            throw new UnexpectedValueException();
+        if (null === $name) {
+            throw new InvalidCharacter($this, $character);
         }
 
         return $name;
@@ -93,8 +100,8 @@ class Utf8 extends CharacterEncoding
             IntlChar::PROPERTY_SCRIPT
         );
 
-        if (!$script) {
-            throw new UnexpectedValueException();
+        if (null === $script) {
+            throw new InvalidCharacter($this, $character);
         }
 
         return $script;
@@ -104,8 +111,8 @@ class Utf8 extends CharacterEncoding
     {
         $codepoint = IntlChar::ord($character);
 
-        if (!$codepoint) {
-            throw new UnexpectedValueException();
+        if (null === $codepoint) {
+            throw new InvalidCharacter($this, $character);
         }
 
         return $codepoint;
@@ -113,32 +120,48 @@ class Utf8 extends CharacterEncoding
 
     public function codeCategory(int $codepoint): int
     {
-        $this->validateCode($codepoint);
+        $category = IntlChar::charType($codepoint);
 
-        return IntlChar::charType($codepoint);
+        if (null === $category) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return $category;
     }
 
     public function codeDirection(int $codepoint): int
     {
-        $this->validateCode($codepoint);
+        $direction = IntlChar::charDirection($codepoint);
 
-        return IntlChar::charDirection($codepoint);
+        if (null === $direction) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return $direction;
     }
 
     public function codeName(int $codepoint): string
     {
-        $this->validateCode($codepoint);
+        $name = IntlChar::charName($codepoint);
 
-        return IntlChar::charName($codepoint);
+        if (null === $name) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return $name;
     }
 
     public function codeScript(int $codepoint): int
     {
-        $this->validateCode($codepoint);
-
-        return IntlChar::getIntPropertyValue(
+        $script = IntlChar::getIntPropertyValue(
             $codepoint,
             IntlChar::PROPERTY_SCRIPT
         );
+
+        if (null === $script) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return $script;
     }
 }

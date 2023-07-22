@@ -1,8 +1,8 @@
 <?php
 
-namespace Hereldar\CharacterEncodings\Traits;
+declare(strict_types=1);
 
-use UnexpectedValueException;
+namespace Hereldar\CharacterEncodings\Traits;
 
 trait IsSingleByte
 {
@@ -11,22 +11,14 @@ trait IsSingleByte
 
     public function char(int $codepoint): string
     {
-        if ($codepoint < $this->minCodepoint()) {
-            throw new UnexpectedValueException();
-        }
-
-        if ($codepoint > $this->maxCodepoint()) {
-            throw new UnexpectedValueException();
-        }
+        $this->codeCategory($codepoint);
 
         return chr($codepoint);
     }
 
     public function code(string $character): int
     {
-        if (1 !== strlen($character)) {
-            throw new UnexpectedValueException();
-        }
+        $this->charCategory($character);
 
         return ord($character);
     }

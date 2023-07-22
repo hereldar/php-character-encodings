@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hereldar\CharacterEncodings;
 
+use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
+use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Indexes\AsciiCharCategories;
 use Hereldar\CharacterEncodings\Indexes\AsciiCharDirections;
 use Hereldar\CharacterEncodings\Indexes\AsciiCharNames;
@@ -12,7 +16,6 @@ use Hereldar\CharacterEncodings\Indexes\AsciiCodeNames;
 use Hereldar\CharacterEncodings\Indexes\AsciiCodeScripts;
 use Hereldar\CharacterEncodings\Traits\IsAsciiCompatible;
 use Hereldar\CharacterEncodings\Traits\IsSingleByte;
-use UnexpectedValueException;
 
 /**
  * @see https://en.wikipedia.org/wiki/ASCII
@@ -79,7 +82,7 @@ class Ascii extends CharacterEncoding
     public function charCategory(string $character): int
     {
         if (!isset(AsciiCharCategories::INDEX[$character])) {
-            throw new UnexpectedValueException();
+            throw new InvalidCharacter($this, $character);
         }
 
         return AsciiCharCategories::INDEX[$character];
@@ -88,7 +91,7 @@ class Ascii extends CharacterEncoding
     public function charDirection(string $character): int
     {
         if (!isset(AsciiCharDirections::INDEX[$character])) {
-            throw new UnexpectedValueException();
+            throw new InvalidCharacter($this, $character);
         }
 
         return AsciiCharDirections::INDEX[$character];
@@ -102,7 +105,7 @@ class Ascii extends CharacterEncoding
     public function charName(string $character): string
     {
         if (!isset(AsciiCharNames::INDEX[$character])) {
-            throw new UnexpectedValueException();
+            throw new InvalidCharacter($this, $character);
         }
 
         return AsciiCharNames::INDEX[$character];
@@ -111,7 +114,7 @@ class Ascii extends CharacterEncoding
     public function charScript(string $character): int
     {
         if (!isset(AsciiCharScripts::INDEX[$character])) {
-            throw new UnexpectedValueException();
+            throw new InvalidCharacter($this, $character);
         }
 
         return AsciiCharScripts::INDEX[$character];
@@ -120,7 +123,7 @@ class Ascii extends CharacterEncoding
     public function codeCategory(int $codepoint): int
     {
         if (!isset(AsciiCodeCategories::INDEX[$codepoint])) {
-            throw new UnexpectedValueException();
+            throw new InvalidCodepoint($this, $codepoint);
         }
 
         return AsciiCodeCategories::INDEX[$codepoint];
@@ -129,7 +132,7 @@ class Ascii extends CharacterEncoding
     public function codeDirection(int $codepoint): int
     {
         if (!isset(AsciiCodeDirections::INDEX[$codepoint])) {
-            throw new UnexpectedValueException();
+            throw new InvalidCodepoint($this, $codepoint);
         }
 
         return AsciiCodeDirections::INDEX[$codepoint];
@@ -143,7 +146,7 @@ class Ascii extends CharacterEncoding
     public function codeName(int $codepoint): string
     {
         if (!isset(AsciiCodeNames::INDEX[$codepoint])) {
-            throw new UnexpectedValueException();
+            throw new InvalidCodepoint($this, $codepoint);
         }
 
         return AsciiCodeNames::INDEX[$codepoint];
@@ -152,7 +155,7 @@ class Ascii extends CharacterEncoding
     public function codeScript(int $codepoint): int
     {
         if (!isset(AsciiCodeScripts::INDEX[$codepoint])) {
-            throw new UnexpectedValueException();
+            throw new InvalidCodepoint($this, $codepoint);
         }
 
         return AsciiCodeScripts::INDEX[$codepoint];

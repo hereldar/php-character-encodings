@@ -34,7 +34,10 @@
     "psr-4": {
       "Hereldar\\CharacterEncodings\\Commands\\": "bin/",
       "Hereldar\\CharacterEncodings\\Tests\\": "tests/"
-    }
+    },
+    "files": [
+      "src/functions.php"
+    ]
   },
   "config": {
     "optimize-autoloader": true,

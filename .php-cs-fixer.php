@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require __DIR__ . '/tools/php-cs-fixer/ClarifyingParenthesesAroundComparisonsFixer.php';
 
 $finder = PhpCsFixer\Finder
