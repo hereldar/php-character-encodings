@@ -162,7 +162,7 @@ class Windows1252CodeDirections
         Direction::LEFT_TO_RIGHT,
         Direction::OTHER_NEUTRAL,
         Direction::LEFT_TO_RIGHT,
-        Direction::OTHER_NEUTRAL,
+        Direction::BOUNDARY_NEUTRAL,
         Direction::LEFT_TO_RIGHT,
         Direction::LEFT_TO_RIGHT,
         Direction::COMMON_NUMBER_SEPARATOR,

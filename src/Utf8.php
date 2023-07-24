@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Hereldar\CharacterEncodings;
 
+use Generator;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Traits\IsAsciiCompatible;
@@ -58,6 +59,32 @@ class Utf8 extends CharacterEncoding
         }
 
         return $character;
+    }
+
+    public function chars(): Generator
+    {
+        $start = $this->minCodepoint();
+        $end = $this->maxCodepoint();
+
+        for ($codepoint = $start; $codepoint < $end; ++$codepoint) {
+            $character = IntlChar::chr($codepoint);
+            if ($character !== null) {
+                yield $character;
+            }
+        }
+    }
+
+    public function codes(): Generator
+    {
+        $start = $this->minCodepoint();
+        $end = $this->maxCodepoint();
+
+        for ($codepoint = $start; $codepoint < $end; ++$codepoint) {
+            $character = IntlChar::chr($codepoint);
+            if ($character !== null) {
+                yield $codepoint;
+            }
+        }
     }
 
     public function charCategory(string $character): int

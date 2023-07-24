@@ -162,7 +162,7 @@ class Windows1252CodeCategories
         Category::LOWERCASE_LETTER,
         Category::FINAL_QUOTE_PUNCTUATION,
         Category::LOWERCASE_LETTER,
-        Category::OTHER_SYMBOL,
+        Category::CONTROL_CHAR,
         Category::LOWERCASE_LETTER,
         Category::UPPERCASE_LETTER,
         Category::SPACE_SEPARATOR,

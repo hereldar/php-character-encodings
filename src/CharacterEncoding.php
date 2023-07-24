@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Hereldar\CharacterEncodings;
 
+use Generator;
 use Hereldar\CharacterEncodings\Enums\Category;
 use UnexpectedValueException;
 
@@ -52,19 +53,13 @@ abstract class CharacterEncoding
      * Returns `true` if the encoding uses a fixed number of bytes to
      * encode its characters; otherwise returns `false`.
      */
-    public function isFixedWidth(): bool
-    {
-        return !$this->isVariableWidth();
-    }
+    abstract public function isFixedWidth(): bool;
 
     /**
      * Returns `true` if the encoding uses more than one byte to
      * encode a single character; otherwise returns `false`.
      */
-    public function isMultiByte(): bool
-    {
-        return !$this->isSingleByte();
-    }
+    abstract public function isMultiByte(): bool;
 
     /**
      * Returns `true` if a part of any codeword in the encoding, or
@@ -73,17 +68,14 @@ abstract class CharacterEncoding
      */
     public function isSelfSynchronized(): bool
     {
-        return $this->isSingleByte();
+        return false;
     }
 
     /**
      * Returns `true` if the encoding uses a single byte to encode all
      * its characters; otherwise returns `false`.
      */
-    public function isSingleByte(): bool
-    {
-        return false;
-    }
+    abstract public function isSingleByte(): bool;
 
     /**
      * Returns `true` if the encoding is capable of encoding all valid
@@ -98,10 +90,7 @@ abstract class CharacterEncoding
      * Returns `true` if the encoding uses varying numbers of bytes
      * to encode different characters; otherwise returns `false`.
      */
-    public function isVariableWidth(): bool
-    {
-        return false;
-    }
+    abstract public function isVariableWidth(): bool;
 
     /**
      * Returns the highest numeric value in the code point range of
@@ -145,67 +134,41 @@ abstract class CharacterEncoding
     abstract public function char(int $codepoint): string;
 
     /**
+     * @return Generator<string>
+     */
+    abstract public function chars(): Generator;
+
+    /**
      * Returns the code point value of the given character.
      */
     abstract public function code(string $character): int;
 
     /**
+     * @return Generator<int>
+     */
+    abstract public function codes(): Generator;
+
+    /**
      * Returns the general category value for the character.
      */
-    public function charCategory(string $character): int
-    {
-        $utf8 = Utf8::encoding();
-
-        return $utf8->charCategory(mb_convert_encoding(
-            $character,
-            $utf8->name(),
-            $this->name()
-        ));
-    }
+    abstract public function charCategory(string $character): int;
 
     /**
      * Returns the bidirectional category value for the character,
      * which is used in the [Unicode bidirectional algorithm
      * (UAX #9)](http://www.unicode.org/reports/tr9/).
      */
-    public function charDirection(string $character): int
-    {
-        $utf8 = Utf8::encoding();
-
-        return $utf8->charDirection(mb_convert_encoding(
-            $character,
-            $utf8->name(),
-            $this->name()
-        ));
-    }
+    abstract public function charDirection(string $character): int;
 
     /**
      * Returns the name for the character.
      */
-    public function charName(string $character): string
-    {
-        $utf8 = Utf8::encoding();
-
-        return $utf8->charName(mb_convert_encoding(
-            $character,
-            $utf8->name(),
-            $this->name()
-        ));
-    }
+    abstract public function charName(string $character): string;
 
     /**
      * Returns the script property value for the character.
      */
-    public function charScript(string $character): int
-    {
-        $utf8 = Utf8::encoding();
-
-        return $utf8->charScript(mb_convert_encoding(
-            $character,
-            $utf8->name(),
-            $this->name()
-        ));
-    }
+    abstract public function charScript(string $character): int;
 
     /**
      * Returns `true` if the specified character is a control
@@ -416,60 +379,24 @@ abstract class CharacterEncoding
     /**
      * Returns the general category value for the code point.
      */
-    public function codeCategory(int $codepoint): int
-    {
-        $utf8 = Utf8::encoding();
-
-        return $utf8->codeCategory(mb_convert_encoding(
-            $this->char($codepoint),
-            $utf8->name(),
-            $this->name()
-        ));
-    }
+    abstract public function codeCategory(int $codepoint): int;
 
     /**
      * Returns the bidirectional category value for the code point,
      * which is used in the [Unicode bidirectional algorithm
      * (UAX #9)](http://www.unicode.org/reports/tr9/).
      */
-    public function codeDirection(int $codepoint): int
-    {
-        $utf8 = Utf8::encoding();
-
-        return $utf8->codeDirection(mb_convert_encoding(
-            $this->char($codepoint),
-            $utf8->name(),
-            $this->name()
-        ));
-    }
+    abstract public function codeDirection(int $codepoint): int;
 
     /**
      * Returns the name for the code point.
      */
-    public function codeName(int $codepoint): string
-    {
-        $utf8 = Utf8::encoding();
-
-        return $utf8->codeName(mb_convert_encoding(
-            $this->char($codepoint),
-            $utf8->name(),
-            $this->name()
-        ));
-    }
+    abstract public function codeName(int $codepoint): string;
 
     /**
      * Returns the script property value for the code point.
      */
-    public function codeScript(int $codepoint): int
-    {
-        $utf8 = Utf8::encoding();
-
-        return $utf8->codeScript(mb_convert_encoding(
-            $this->char($codepoint),
-            $utf8->name(),
-            $this->name()
-        ));
-    }
+    abstract public function codeScript(int $codepoint): int;
 
     /**
      * Returns `true` if the specified code point is a control

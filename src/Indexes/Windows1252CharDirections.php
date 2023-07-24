@@ -162,7 +162,7 @@ class Windows1252CharDirections
         "\x9a" => Direction::LEFT_TO_RIGHT,
         "\x9b" => Direction::OTHER_NEUTRAL,
         "\x9c" => Direction::LEFT_TO_RIGHT,
-        "\x9d" => Direction::OTHER_NEUTRAL,
+        "\x9d" => Direction::BOUNDARY_NEUTRAL,
         "\x9e" => Direction::LEFT_TO_RIGHT,
         "\x9f" => Direction::LEFT_TO_RIGHT,
         "\xa0" => Direction::COMMON_NUMBER_SEPARATOR,

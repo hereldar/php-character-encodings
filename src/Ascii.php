@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Hereldar\CharacterEncodings;
 
+use Generator;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Indexes\AsciiCharCategories;
@@ -78,6 +79,20 @@ class Ascii extends CharacterEncoding
 
     public const VISIBLE = self::LETTERS . self::NUMBERS . self::PUNCTUATION . self::SYMBOLS;
     public const PRINTABLE = self::VISIBLE . self::WHITESPACES;
+
+    public function chars(): Generator
+    {
+        foreach (AsciiCharCategories::INDEX as $character => $category) {
+            yield (string) $character;
+        }
+    }
+
+    public function codes(): Generator
+    {
+        foreach (AsciiCodeCategories::INDEX as $codepoint => $category) {
+            yield $codepoint;
+        }
+    }
 
     public function charCategory(string $character): int
     {

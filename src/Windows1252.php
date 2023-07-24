@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Hereldar\CharacterEncodings;
 
+use Generator;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Indexes\Windows1252CharCategories;
@@ -81,6 +82,20 @@ class Windows1252 extends CharacterEncoding
 
     public const VISIBLE = self::LETTERS . self::NUMBERS . self::PUNCTUATION . self::SYMBOLS;
     public const PRINTABLE = self::VISIBLE . self::WHITESPACES;
+
+    public function chars(): Generator
+    {
+        foreach (Windows1252CharCategories::INDEX as $character => $category) {
+            yield (string) $character;
+        }
+    }
+
+    public function codes(): Generator
+    {
+        foreach (Windows1252CodeCategories::INDEX as $codepoint => $category) {
+            yield $codepoint;
+        }
+    }
 
     public function charCategory(string $character): int
     {

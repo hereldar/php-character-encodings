@@ -162,7 +162,7 @@ class Windows1252CharCategories
         "\x9a" => Category::LOWERCASE_LETTER,
         "\x9b" => Category::FINAL_QUOTE_PUNCTUATION,
         "\x9c" => Category::LOWERCASE_LETTER,
-        "\x9d" => Category::OTHER_SYMBOL,
+        "\x9d" => Category::CONTROL_CHAR,
         "\x9e" => Category::LOWERCASE_LETTER,
         "\x9f" => Category::UPPERCASE_LETTER,
         "\xa0" => Category::SPACE_SEPARATOR,

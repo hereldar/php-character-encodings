@@ -160,7 +160,7 @@ class Windows1252CharNames
         "\x9a" => 'LATIN SMALL LETTER S WITH CARON',
         "\x9b" => 'SINGLE RIGHT-POINTING ANGLE QUOTATION MARK',
         "\x9c" => 'LATIN SMALL LIGATURE OE',
-        "\x9d" => 'REPLACEMENT CHARACTER',
+        "\x9d" => '',
         "\x9e" => 'LATIN SMALL LETTER Z WITH CARON',
         "\x9f" => 'LATIN CAPITAL LETTER Y WITH DIAERESIS',
         "\xa0" => 'NO-BREAK SPACE',
