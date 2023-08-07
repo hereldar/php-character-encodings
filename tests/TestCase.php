@@ -55,69 +55,69 @@ abstract class TestCase extends PHPUnitTestCase
     }
 
     public static function assertCharCategory(
-        int $expectedCategory,
+        int $actualCategory,
         string $character,
     ): void {
         $utf8 = Utf8::encoding();
 
         $utf8Character = mb_convert_encoding(
-            $character,
-            $utf8->name(),
-            static::encoding()->name()
+            string: $character,
+            to_encoding: $utf8->name(),
+            from_encoding: static::encoding()->name(),
         );
 
-        $actualCategory = $utf8->charCategory($utf8Character);
+        $expectedCategory = $utf8->charCategory($utf8Character);
 
         static::assertSame($expectedCategory, $actualCategory);
     }
 
     public static function assertCharDirection(
-        int $expectedDirection,
+        int $actualDirection,
         string $character,
     ): void {
         $utf8 = Utf8::encoding();
 
         $utf8Character = mb_convert_encoding(
-            $character,
-            $utf8->name(),
-            static::encoding()->name()
+            string: $character,
+            to_encoding: $utf8->name(),
+            from_encoding: static::encoding()->name(),
         );
 
-        $actualDirection = $utf8->charDirection($utf8Character);
+        $expectedDirection = $utf8->charDirection($utf8Character);
 
         static::assertSame($expectedDirection, $actualDirection);
     }
 
     public static function assertCharName(
-        string $expectedName,
+        string $actualName,
         string $character,
     ): void {
         $utf8 = Utf8::encoding();
 
         $utf8Character = mb_convert_encoding(
-            $character,
-            $utf8->name(),
-            static::encoding()->name()
+            string: $character,
+            to_encoding: $utf8->name(),
+            from_encoding: static::encoding()->name(),
         );
 
-        $actualName = $utf8->charName($utf8Character);
+        $expectedName = $utf8->charName($utf8Character);
 
         static::assertSame($expectedName, $actualName);
     }
 
     public static function assertCharScript(
-        int $expectedScript,
+        int $actualScript,
         string $character,
     ): void {
         $utf8 = Utf8::encoding();
 
         $utf8Character = mb_convert_encoding(
-            $character,
-            $utf8->name(),
-            static::encoding()->name()
+            string: $character,
+            to_encoding: $utf8->name(),
+            from_encoding: static::encoding()->name(),
         );
 
-        $actualScript = $utf8->charScript($utf8Character);
+        $expectedScript = $utf8->charScript($utf8Character);
 
         static::assertSame($expectedScript, $actualScript);
     }

@@ -138,8 +138,7 @@ class Utf8 extends CharacterEncoding
         $end = $this->maxCodepoint();
 
         for ($codepoint = $start; $codepoint < $end; ++$codepoint) {
-            $character = IntlChar::chr($codepoint);
-            if ($character !== null) {
+            if (IntlChar::chr($codepoint) !== null) {
                 yield $codepoint;
             }
         }
