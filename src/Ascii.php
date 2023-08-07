@@ -75,10 +75,14 @@ class Ascii extends CharacterEncoding
     public const SYMBOLS
         = "\x24\x2b\x3c\x3d\x3e\x5e\x60\x7c\x7e";
 
-    public const WHITESPACES = " \t\r\n\v\f";
+    public const WHITESPACES
+        = " \t\r\n\v\f";
 
-    public const VISIBLE = self::LETTERS . self::NUMBERS . self::PUNCTUATION . self::SYMBOLS;
-    public const PRINTABLE = self::VISIBLE . self::WHITESPACES;
+    public const VISIBLE
+        = self::LETTERS . self::NUMBERS . self::PUNCTUATION . self::SYMBOLS;
+
+    public const PRINTABLE
+        = self::VISIBLE . self::WHITESPACES;
 
     public function chars(): Generator
     {

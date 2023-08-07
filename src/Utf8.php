@@ -74,19 +74,6 @@ class Utf8 extends CharacterEncoding
         }
     }
 
-    public function codes(): Generator
-    {
-        $start = $this->minCodepoint();
-        $end = $this->maxCodepoint();
-
-        for ($codepoint = $start; $codepoint < $end; ++$codepoint) {
-            $character = IntlChar::chr($codepoint);
-            if ($character !== null) {
-                yield $codepoint;
-            }
-        }
-    }
-
     public function charCategory(string $character): int
     {
         $category = IntlChar::charType($character);
@@ -143,6 +130,19 @@ class Utf8 extends CharacterEncoding
         }
 
         return $codepoint;
+    }
+
+    public function codes(): Generator
+    {
+        $start = $this->minCodepoint();
+        $end = $this->maxCodepoint();
+
+        for ($codepoint = $start; $codepoint < $end; ++$codepoint) {
+            $character = IntlChar::chr($codepoint);
+            if ($character !== null) {
+                yield $codepoint;
+            }
+        }
     }
 
     public function codeCategory(int $codepoint): int
