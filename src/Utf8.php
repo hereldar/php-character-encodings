@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Hereldar\CharacterEncodings;
 
 use Generator;
+use Hereldar\CharacterEncodings\Enums\Category;
+use Hereldar\CharacterEncodings\Enums\Direction;
+use Hereldar\CharacterEncodings\Enums\Script;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Traits\IsAsciiCompatible;
@@ -52,6 +55,7 @@ class Utf8 extends CharacterEncoding
 
     public function char(int $codepoint): string
     {
+        /** @var string|null $character */
         $character = IntlChar::chr($codepoint);
 
         if (null === $character) {
@@ -74,30 +78,33 @@ class Utf8 extends CharacterEncoding
         }
     }
 
-    public function charCategory(string $character): int
+    public function charCategory(string $character): Category
     {
+        /** @var int|null $category */
         $category = IntlChar::charType($character);
 
         if (null === $category) {
             throw new InvalidCharacter($this, $character);
         }
 
-        return $category;
+        return Category::from($category);
     }
 
-    public function charDirection(string $character): int
+    public function charDirection(string $character): Direction
     {
+        /** @var int|null $direction */
         $direction = IntlChar::charDirection($character);
 
         if (null === $direction) {
             throw new InvalidCharacter($this, $character);
         }
 
-        return $direction;
+        return Direction::from($direction);
     }
 
     public function charName(string $character): string
     {
+        /** @var string|null $name */
         $name = IntlChar::charName($character);
 
         if (null === $name) {
@@ -107,8 +114,9 @@ class Utf8 extends CharacterEncoding
         return $name;
     }
 
-    public function charScript(string $character): int
+    public function charScript(string $character): Script
     {
+        /** @var int|null $script */
         $script = IntlChar::getIntPropertyValue(
             $character,
             IntlChar::PROPERTY_SCRIPT
@@ -118,11 +126,12 @@ class Utf8 extends CharacterEncoding
             throw new InvalidCharacter($this, $character);
         }
 
-        return $script;
+        return Script::from($script);
     }
 
     public function code(string $character): int
     {
+        /** @var int|null $codepoint */
         $codepoint = IntlChar::ord($character);
 
         if (null === $codepoint) {
@@ -144,30 +153,33 @@ class Utf8 extends CharacterEncoding
         }
     }
 
-    public function codeCategory(int $codepoint): int
+    public function codeCategory(int $codepoint): Category
     {
+        /** @var int|null $category */
         $category = IntlChar::charType($codepoint);
 
         if (null === $category) {
             throw new InvalidCodepoint($this, $codepoint);
         }
 
-        return $category;
+        return Category::from($category);
     }
 
-    public function codeDirection(int $codepoint): int
+    public function codeDirection(int $codepoint): Direction
     {
+        /** @var int|null $direction */
         $direction = IntlChar::charDirection($codepoint);
 
         if (null === $direction) {
             throw new InvalidCodepoint($this, $codepoint);
         }
 
-        return $direction;
+        return Direction::from($direction);
     }
 
     public function codeName(int $codepoint): string
     {
+        /** @var string|null $name */
         $name = IntlChar::charName($codepoint);
 
         if (null === $name) {
@@ -177,8 +189,9 @@ class Utf8 extends CharacterEncoding
         return $name;
     }
 
-    public function codeScript(int $codepoint): int
+    public function codeScript(int $codepoint): Script
     {
+        /** @var int|null $script */
         $script = IntlChar::getIntPropertyValue(
             $codepoint,
             IntlChar::PROPERTY_SCRIPT
@@ -188,6 +201,6 @@ class Utf8 extends CharacterEncoding
             throw new InvalidCodepoint($this, $codepoint);
         }
 
-        return $script;
+        return Script::from($script);
     }
 }

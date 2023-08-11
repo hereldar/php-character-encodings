@@ -6,7 +6,7 @@ namespace Hereldar\CharacterEncodings\Tests;
 
 use Hereldar\CharacterEncodings\Ascii;
 
-final class AsciiTest extends TestCase
+final class AsciiTest extends CharacterEncodingTestCase
 {
     protected static function encoding(): Ascii
     {

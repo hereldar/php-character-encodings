@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Hereldar\CharacterEncodings;
 
 use Generator;
+use Hereldar\CharacterEncodings\Enums\Category;
+use Hereldar\CharacterEncodings\Enums\Direction;
+use Hereldar\CharacterEncodings\Enums\Script;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Indexes\Windows1252CharCategories;
@@ -33,19 +36,19 @@ class Windows1252 extends CharacterEncoding
 
     public function chars(): Generator
     {
-        foreach (Windows1252CharCategories::INDEX as $character => $category) {
+        foreach (Windows1252CharCategories::INDEX as $character => $_) {
             yield (string) $character;
         }
     }
 
     public function codes(): Generator
     {
-        foreach (Windows1252CodeCategories::INDEX as $codepoint => $category) {
+        foreach (Windows1252CodeCategories::INDEX as $codepoint => $_) {
             yield $codepoint;
         }
     }
 
-    public function charCategory(string $character): int
+    public function charCategory(string $character): Category
     {
         if (!isset(Windows1252CharCategories::INDEX[$character])) {
             throw new InvalidCharacter($this, $character);
@@ -54,7 +57,7 @@ class Windows1252 extends CharacterEncoding
         return Windows1252CharCategories::INDEX[$character];
     }
 
-    public function charDirection(string $character): int
+    public function charDirection(string $character): Direction
     {
         if (!isset(Windows1252CharDirections::INDEX[$character])) {
             throw new InvalidCharacter($this, $character);
@@ -72,7 +75,7 @@ class Windows1252 extends CharacterEncoding
         return Windows1252CharNames::INDEX[$character];
     }
 
-    public function charScript(string $character): int
+    public function charScript(string $character): Script
     {
         if (!isset(Windows1252CharScripts::INDEX[$character])) {
             throw new InvalidCharacter($this, $character);
@@ -81,7 +84,7 @@ class Windows1252 extends CharacterEncoding
         return Windows1252CharScripts::INDEX[$character];
     }
 
-    public function codeCategory(int $codepoint): int
+    public function codeCategory(int $codepoint): Category
     {
         if (!isset(Windows1252CodeCategories::INDEX[$codepoint])) {
             throw new InvalidCodepoint($this, $codepoint);
@@ -90,7 +93,7 @@ class Windows1252 extends CharacterEncoding
         return Windows1252CodeCategories::INDEX[$codepoint];
     }
 
-    public function codeDirection(int $codepoint): int
+    public function codeDirection(int $codepoint): Direction
     {
         if (!isset(Windows1252CodeDirections::INDEX[$codepoint])) {
             throw new InvalidCodepoint($this, $codepoint);
@@ -108,7 +111,7 @@ class Windows1252 extends CharacterEncoding
         return Windows1252CodeNames::INDEX[$codepoint];
     }
 
-    public function codeScript(int $codepoint): int
+    public function codeScript(int $codepoint): Script
     {
         if (!isset(Windows1252CodeScripts::INDEX[$codepoint])) {
             throw new InvalidCodepoint($this, $codepoint);

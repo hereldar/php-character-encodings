@@ -6,6 +6,10 @@ namespace Hereldar\CharacterEncodings;
 
 use Generator;
 use Hereldar\CharacterEncodings\Enums\Category;
+use Hereldar\CharacterEncodings\Enums\CategoryGroup;
+use Hereldar\CharacterEncodings\Enums\Direction;
+use Hereldar\CharacterEncodings\Enums\Script;
+use Stringable;
 use UnexpectedValueException;
 
 /**
@@ -16,8 +20,21 @@ use UnexpectedValueException;
  * @see https://www.php.net/manual/en/class.intlchar.php
  * @see https://doc.qt.io/qt-6/qchar.html
  */
-abstract class CharacterEncoding
+abstract class CharacterEncoding implements Stringable
 {
+    /** @var non-empty-string */
+    public const NAME = '';   // @phpstan-ignore-line
+
+    /** @var positive-int|null */
+    public const WIDTH = null;
+
+    /** @var positive-int */
+    public const CODEPOINT_MAX = PHP_INT_MAX;
+
+    /** @var non-negative-int */
+    public const CODEPOINT_MIN = 0;
+
+    /** @var array<class-string, static> */
     private static array $instances = [];
 
     private function __construct()
@@ -95,6 +112,8 @@ abstract class CharacterEncoding
     /**
      * Returns the highest numeric value in the code point range of
      * the encoding.
+     *
+     * @return positive-int
      */
     public function maxCodepoint(): int
     {
@@ -104,6 +123,8 @@ abstract class CharacterEncoding
     /**
      * Returns the lowest numeric value in the code point range of
      * the encoding.
+     *
+     * @return non-negative-int
      */
     public function minCodepoint(): int
     {
@@ -112,6 +133,8 @@ abstract class CharacterEncoding
 
     /**
      * Returns the name of the character encoding.
+     *
+     * @return non-empty-string
      */
     public function name(): string
     {
@@ -121,6 +144,8 @@ abstract class CharacterEncoding
     /**
      * If the encoding is fixed-width, it returns the number of bytes
      * required to encode its characters; otherwise it returns `null`.
+     *
+     * @return positive-int|null
      */
     public function width(): ?int
     {
@@ -151,14 +176,14 @@ abstract class CharacterEncoding
     /**
      * Returns the general category value for the character.
      */
-    abstract public function charCategory(string $character): int;
+    abstract public function charCategory(string $character): Category;
 
     /**
      * Returns the bidirectional category value for the character,
      * which is used in the [Unicode bidirectional algorithm
      * (UAX #9)](http://www.unicode.org/reports/tr9/).
      */
-    abstract public function charDirection(string $character): int;
+    abstract public function charDirection(string $character): Direction;
 
     /**
      * Returns the name for the character.
@@ -168,7 +193,7 @@ abstract class CharacterEncoding
     /**
      * Returns the script property value for the character.
      */
-    abstract public function charScript(string $character): int;
+    abstract public function charScript(string $character): Script;
 
     /**
      * Returns `true` if the specified character is a control
@@ -177,10 +202,10 @@ abstract class CharacterEncoding
     public function charIsControl(string $character): bool
     {
         return in_array($this->charCategory($character), [
-            Category::CONTROL_CHAR,
-            Category::FORMAT_CHAR,
-            Category::LINE_SEPARATOR,
-            Category::PARAGRAPH_SEPARATOR,
+            Category::ControlChar,
+            Category::FormatChar,
+            Category::LineSeparator,
+            Category::ParagraphSeparator,
         ], true);
     }
 
@@ -190,7 +215,7 @@ abstract class CharacterEncoding
      */
     public function charIsDigit(string $character): bool
     {
-        return (Category::DECIMAL_DIGIT_NUMBER === $this->charCategory($character));
+        return (Category::DecimalDigitNumber === $this->charCategory($character));
     }
 
     /**
@@ -199,12 +224,7 @@ abstract class CharacterEncoding
      */
     public function charIsLetter(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::UPPERCASE_LETTER,
-            Category::LOWERCASE_LETTER,
-            Category::TITLECASE_LETTER,
-            Category::MODIFIER_LETTER,
-        ], true);
+        return (CategoryGroup::Letter === $this->charCategory($character)->group());
     }
 
     /**
@@ -213,15 +233,10 @@ abstract class CharacterEncoding
      */
     public function charIsLetterOrNumber(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::UPPERCASE_LETTER,
-            Category::LOWERCASE_LETTER,
-            Category::TITLECASE_LETTER,
-            Category::MODIFIER_LETTER,
-            Category::DECIMAL_DIGIT_NUMBER,
-            Category::LETTER_NUMBER,
-            Category::OTHER_NUMBER,
-        ], true);
+        $categoryGroup = $this->charCategory($character)->group();
+
+        return (CategoryGroup::Letter === $categoryGroup)
+            || (CategoryGroup::Number === $categoryGroup);
     }
 
     /**
@@ -230,7 +245,7 @@ abstract class CharacterEncoding
      */
     public function charIsLower(string $character): bool
     {
-        return (Category::LOWERCASE_LETTER === $this->charCategory($character));
+        return (Category::LowercaseLetter === $this->charCategory($character));
     }
 
     /**
@@ -239,11 +254,7 @@ abstract class CharacterEncoding
      */
     public function charIsMark(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::NON_SPACING_MARK,
-            Category::ENCLOSING_MARK,
-            Category::COMBINING_SPACING_MARK,
-        ], true);
+        return (CategoryGroup::Mark === $this->charCategory($character)->group());
     }
 
     /**
@@ -261,11 +272,7 @@ abstract class CharacterEncoding
      */
     public function charIsNumber(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::DECIMAL_DIGIT_NUMBER,
-            Category::LETTER_NUMBER,
-            Category::OTHER_NUMBER,
-        ], true);
+        return (CategoryGroup::Number === $this->charCategory($character)->group());
     }
 
     /**
@@ -275,10 +282,10 @@ abstract class CharacterEncoding
     public function charIsPrintable(string $character): bool
     {
         return !in_array($this->charCategory($character), [
-            Category::CONTROL_CHAR,
-            Category::FORMAT_CHAR,
-            Category::LINE_SEPARATOR,
-            Category::PARAGRAPH_SEPARATOR,
+            Category::ControlChar,
+            Category::FormatChar,
+            Category::LineSeparator,
+            Category::ParagraphSeparator,
         ], true);
     }
 
@@ -288,15 +295,7 @@ abstract class CharacterEncoding
      */
     public function charIsPunctuation(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::DASH_PUNCTUATION,
-            Category::OPEN_PUNCTUATION,
-            Category::CLOSE_PUNCTUATION,
-            Category::CONNECTOR_PUNCTUATION,
-            Category::OTHER_PUNCTUATION,
-            Category::INITIAL_QUOTE_PUNCTUATION,
-            Category::FINAL_QUOTE_PUNCTUATION,
-        ], true);
+        return (CategoryGroup::Punctuation === $this->charCategory($character)->group());
     }
 
     /**
@@ -305,11 +304,7 @@ abstract class CharacterEncoding
      */
     public function charIsSeparator(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::SPACE_SEPARATOR,
-            Category::LINE_SEPARATOR,
-            Category::PARAGRAPH_SEPARATOR,
-        ], true);
+        return (CategoryGroup::Separator === $this->charCategory($character)->group());
     }
 
     /**
@@ -318,12 +313,7 @@ abstract class CharacterEncoding
      */
     public function charIsSymbol(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::MATH_SYMBOL,
-            Category::CURRENCY_SYMBOL,
-            Category::MODIFIER_SYMBOL,
-            Category::OTHER_SYMBOL,
-        ], true);
+        return (CategoryGroup::Symbol === $this->charCategory($character)->group());
     }
 
     /**
@@ -332,7 +322,7 @@ abstract class CharacterEncoding
      */
     public function charIsTitle(string $character): bool
     {
-        return (Category::TITLECASE_LETTER === $this->charCategory($character));
+        return (Category::TitlecaseLetter === $this->charCategory($character));
     }
 
     /**
@@ -341,7 +331,7 @@ abstract class CharacterEncoding
      */
     public function charIsUpper(string $character): bool
     {
-        return (Category::UPPERCASE_LETTER === $this->charCategory($character));
+        return (Category::UppercaseLetter === $this->charCategory($character));
     }
 
     /**
@@ -358,12 +348,12 @@ abstract class CharacterEncoding
      */
     public function charIsVisible(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::CONTROL_CHAR,
-            Category::FORMAT_CHAR,
-            Category::SPACE_SEPARATOR,
-            Category::LINE_SEPARATOR,
-            Category::PARAGRAPH_SEPARATOR,
+        return !in_array($this->charCategory($character), [
+            Category::ControlChar,
+            Category::FormatChar,
+            Category::SpaceSeparator,
+            Category::LineSeparator,
+            Category::ParagraphSeparator,
         ], true);
     }
 
@@ -379,14 +369,14 @@ abstract class CharacterEncoding
     /**
      * Returns the general category value for the code point.
      */
-    abstract public function codeCategory(int $codepoint): int;
+    abstract public function codeCategory(int $codepoint): Category;
 
     /**
      * Returns the bidirectional category value for the code point,
      * which is used in the [Unicode bidirectional algorithm
      * (UAX #9)](http://www.unicode.org/reports/tr9/).
      */
-    abstract public function codeDirection(int $codepoint): int;
+    abstract public function codeDirection(int $codepoint): Direction;
 
     /**
      * Returns the name for the code point.
@@ -396,7 +386,7 @@ abstract class CharacterEncoding
     /**
      * Returns the script property value for the code point.
      */
-    abstract public function codeScript(int $codepoint): int;
+    abstract public function codeScript(int $codepoint): Script;
 
     /**
      * Returns `true` if the specified code point is a control
@@ -405,10 +395,10 @@ abstract class CharacterEncoding
     public function codeIsControl(int $codepoint): bool
     {
         return in_array($this->codeCategory($codepoint), [
-            Category::CONTROL_CHAR,
-            Category::FORMAT_CHAR,
-            Category::LINE_SEPARATOR,
-            Category::PARAGRAPH_SEPARATOR,
+            Category::ControlChar,
+            Category::FormatChar,
+            Category::LineSeparator,
+            Category::ParagraphSeparator,
         ], true);
     }
 
@@ -418,7 +408,7 @@ abstract class CharacterEncoding
      */
     public function codeIsDigit(int $codepoint): bool
     {
-        return (Category::DECIMAL_DIGIT_NUMBER === $this->codeCategory($codepoint));
+        return (Category::DecimalDigitNumber === $this->codeCategory($codepoint));
     }
 
     /**
@@ -427,12 +417,7 @@ abstract class CharacterEncoding
      */
     public function codeIsLetter(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::UPPERCASE_LETTER,
-            Category::LOWERCASE_LETTER,
-            Category::TITLECASE_LETTER,
-            Category::MODIFIER_LETTER,
-        ], true);
+        return (CategoryGroup::Letter === $this->codeCategory($codepoint)->group());
     }
 
     /**
@@ -441,15 +426,10 @@ abstract class CharacterEncoding
      */
     public function codeIsLetterOrNumber(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::UPPERCASE_LETTER,
-            Category::LOWERCASE_LETTER,
-            Category::TITLECASE_LETTER,
-            Category::MODIFIER_LETTER,
-            Category::DECIMAL_DIGIT_NUMBER,
-            Category::LETTER_NUMBER,
-            Category::OTHER_NUMBER,
-        ], true);
+        $categoryGroup = $this->codeCategory($codepoint)->group();
+
+        return (CategoryGroup::Letter === $categoryGroup)
+            || (CategoryGroup::Number === $categoryGroup);
     }
 
     /**
@@ -458,7 +438,7 @@ abstract class CharacterEncoding
      */
     public function codeIsLower(int $codepoint): bool
     {
-        return (Category::LOWERCASE_LETTER === $this->codeCategory($codepoint));
+        return (Category::LowercaseLetter === $this->codeCategory($codepoint));
     }
 
     /**
@@ -467,11 +447,7 @@ abstract class CharacterEncoding
      */
     public function codeIsMark(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::NON_SPACING_MARK,
-            Category::ENCLOSING_MARK,
-            Category::COMBINING_SPACING_MARK,
-        ], true);
+        return (CategoryGroup::Mark === $this->codeCategory($codepoint)->group());
     }
 
     /**
@@ -489,11 +465,7 @@ abstract class CharacterEncoding
      */
     public function codeIsNumber(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::DECIMAL_DIGIT_NUMBER,
-            Category::LETTER_NUMBER,
-            Category::OTHER_NUMBER,
-        ], true);
+        return (CategoryGroup::Number === $this->codeCategory($codepoint)->group());
     }
 
     /**
@@ -503,10 +475,10 @@ abstract class CharacterEncoding
     public function codeIsPrintable(int $codepoint): bool
     {
         return !in_array($this->codeCategory($codepoint), [
-            Category::CONTROL_CHAR,
-            Category::FORMAT_CHAR,
-            Category::LINE_SEPARATOR,
-            Category::PARAGRAPH_SEPARATOR,
+            Category::ControlChar,
+            Category::FormatChar,
+            Category::LineSeparator,
+            Category::ParagraphSeparator,
         ], true);
     }
 
@@ -516,15 +488,7 @@ abstract class CharacterEncoding
      */
     public function codeIsPunctuation(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::DASH_PUNCTUATION,
-            Category::OPEN_PUNCTUATION,
-            Category::CLOSE_PUNCTUATION,
-            Category::CONNECTOR_PUNCTUATION,
-            Category::OTHER_PUNCTUATION,
-            Category::INITIAL_QUOTE_PUNCTUATION,
-            Category::FINAL_QUOTE_PUNCTUATION,
-        ], true);
+        return (CategoryGroup::Punctuation === $this->codeCategory($codepoint)->group());
     }
 
     /**
@@ -533,11 +497,7 @@ abstract class CharacterEncoding
      */
     public function codeIsSeparator(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::SPACE_SEPARATOR,
-            Category::LINE_SEPARATOR,
-            Category::PARAGRAPH_SEPARATOR,
-        ], true);
+        return (CategoryGroup::Separator === $this->codeCategory($codepoint)->group());
     }
 
     /**
@@ -546,12 +506,7 @@ abstract class CharacterEncoding
      */
     public function codeIsSymbol(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::MATH_SYMBOL,
-            Category::CURRENCY_SYMBOL,
-            Category::MODIFIER_SYMBOL,
-            Category::OTHER_SYMBOL,
-        ], true);
+        return (CategoryGroup::Symbol === $this->codeCategory($codepoint)->group());
     }
 
     /**
@@ -560,7 +515,7 @@ abstract class CharacterEncoding
      */
     public function codeIsTitle(int $codepoint): bool
     {
-        return (Category::TITLECASE_LETTER === $this->codeCategory($codepoint));
+        return (Category::TitlecaseLetter === $this->codeCategory($codepoint));
     }
 
     /**
@@ -569,7 +524,7 @@ abstract class CharacterEncoding
      */
     public function codeIsUpper(int $codepoint): bool
     {
-        return (Category::UPPERCASE_LETTER === $this->codeCategory($codepoint));
+        return (Category::UppercaseLetter === $this->codeCategory($codepoint));
     }
 
     /**
@@ -593,11 +548,11 @@ abstract class CharacterEncoding
     public function codeIsVisible(int $codepoint): bool
     {
         return in_array($this->codeCategory($codepoint), [
-            Category::CONTROL_CHAR,
-            Category::FORMAT_CHAR,
-            Category::SPACE_SEPARATOR,
-            Category::LINE_SEPARATOR,
-            Category::PARAGRAPH_SEPARATOR,
+            Category::ControlChar,
+            Category::FormatChar,
+            Category::SpaceSeparator,
+            Category::LineSeparator,
+            Category::ParagraphSeparator,
         ], true);
     }
 
@@ -607,19 +562,13 @@ abstract class CharacterEncoding
      */
     public function codeIsWhitespace(int $codepoint): bool
     {
-        if ($this->isSingleByte()) {
-            $character = $this->char($codepoint);
-            return str_contains($character, static::WHITESPACES);
-        }
-
         if ($this->isAsciiCompatible()) {
             $ascii = Ascii::encoding();
-
             if ($ascii->codeIsValid($codepoint)) {
                 return $ascii->codeIsWhitespace($codepoint);
             }
         }
 
-        return (Category::SPACE_SEPARATOR === $this->codeCategory($codepoint));
+        return (Category::SpaceSeparator === $this->codeCategory($codepoint));
     }
 }
