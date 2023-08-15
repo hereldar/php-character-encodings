@@ -70,11 +70,12 @@ class Utf8 extends CharacterEncoding
         $start = $this->minCodepoint();
         $end = $this->maxCodepoint();
 
-        for ($codepoint = $start; $codepoint < $end; ++$codepoint) {
-            $character = IntlChar::chr($codepoint);
-            if ($character !== null) {
-                yield $character;
-            }
+        for ($codepoint = $start; $codepoint < 0xD7FF; ++$codepoint) {
+            yield IntlChar::chr($codepoint);
+        }
+
+        for ($codepoint = 0xE000; $codepoint < $end; ++$codepoint) {
+            yield IntlChar::chr($codepoint);
         }
     }
 
@@ -146,61 +147,57 @@ class Utf8 extends CharacterEncoding
         $start = $this->minCodepoint();
         $end = $this->maxCodepoint();
 
-        for ($codepoint = $start; $codepoint < $end; ++$codepoint) {
-            if (IntlChar::chr($codepoint) !== null) {
-                yield $codepoint;
-            }
+        for ($codepoint = $start; $codepoint < 0xD7FF; ++$codepoint) {
+            yield $codepoint;
+        }
+
+        for ($codepoint = 0xE000; $codepoint < $end; ++$codepoint) {
+            yield $codepoint;
         }
     }
 
     public function codeCategory(int $codepoint): Category
     {
-        /** @var int|null $category */
-        $category = IntlChar::charType($codepoint);
-
-        if (null === $category) {
+        if (!$this->codeIsValid($codepoint)) {
             throw new InvalidCodepoint($this, $codepoint);
         }
 
-        return Category::from($category);
+        return Category::from(IntlChar::charType($codepoint));
     }
 
     public function codeDirection(int $codepoint): Direction
     {
-        /** @var int|null $direction */
-        $direction = IntlChar::charDirection($codepoint);
-
-        if (null === $direction) {
+        if (!$this->codeIsValid($codepoint)) {
             throw new InvalidCodepoint($this, $codepoint);
         }
 
-        return Direction::from($direction);
+        return Direction::from(IntlChar::charDirection($codepoint));
+    }
+
+    public function codeIsValid(int $codepoint): bool
+    {
+        return ($codepoint >= $this->minCodepoint() && $codepoint <= 0xD7FF)
+            || ($codepoint >= 0xE000 && $codepoint <= $this->maxCodepoint());
     }
 
     public function codeName(int $codepoint): string
     {
-        /** @var string|null $name */
-        $name = IntlChar::charName($codepoint);
-
-        if (null === $name) {
+        if (!$this->codeIsValid($codepoint)) {
             throw new InvalidCodepoint($this, $codepoint);
         }
 
-        return $name;
+        return IntlChar::charName($codepoint);
     }
 
     public function codeScript(int $codepoint): Script
     {
-        /** @var int|null $script */
-        $script = IntlChar::getIntPropertyValue(
-            $codepoint,
-            IntlChar::PROPERTY_SCRIPT
-        );
-
-        if (null === $script) {
+        if (!$this->codeIsValid($codepoint)) {
             throw new InvalidCodepoint($this, $codepoint);
         }
 
-        return Script::from($script);
+        return Script::from(IntlChar::getIntPropertyValue(
+            $codepoint,
+            IntlChar::PROPERTY_SCRIPT
+        ));
     }
 }

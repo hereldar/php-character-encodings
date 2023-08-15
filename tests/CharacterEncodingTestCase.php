@@ -4,169 +4,32 @@ declare(strict_types=1);
 
 namespace Hereldar\CharacterEncodings\Tests;
 
+use Generator;
 use Hereldar\CharacterEncodings\CharacterEncoding;
 use Hereldar\CharacterEncodings\Enums\Category;
 use Hereldar\CharacterEncodings\Enums\Direction;
 use Hereldar\CharacterEncodings\Enums\Script;
+use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
+use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Utf8;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class CharacterEncodingTestCase extends TestCase
 {
-    abstract protected static function encoding(): CharacterEncoding;
+    abstract public static function encoding(): CharacterEncoding;
 
-    public static function assertCharCategory(
-        Category $actualCategory,
-        string $character,
-    ): void {
-        $utf8 = Utf8::encoding();
-
-        $utf8Character = mb_convert_encoding(
-            string: $character,
-            to_encoding: $utf8->name(),
-            from_encoding: static::encoding()->name(),
-        );
-
-        $expectedCategory = $utf8->charCategory($utf8Character);
-
-        static::assertSame($expectedCategory, $actualCategory);
-    }
-
-    public static function assertCharDirection(
-        Direction $actualDirection,
-        string $character,
-    ): void {
-        $utf8 = Utf8::encoding();
-
-        $utf8Character = mb_convert_encoding(
-            string: $character,
-            to_encoding: $utf8->name(),
-            from_encoding: static::encoding()->name(),
-        );
-
-        $expectedDirection = $utf8->charDirection($utf8Character);
-
-        static::assertSame($expectedDirection, $actualDirection);
-    }
-
-    public static function assertCharName(
-        string $actualName,
-        string $character,
-    ): void {
-        $utf8 = Utf8::encoding();
-
-        $utf8Character = mb_convert_encoding(
-            string: $character,
-            to_encoding: $utf8->name(),
-            from_encoding: static::encoding()->name(),
-        );
-
-        $expectedName = $utf8->charName($utf8Character);
-
-        static::assertSame($expectedName, $actualName);
-    }
-
-    public static function assertCharScript(
-        Script $actualScript,
-        string $character,
-    ): void {
-        $utf8 = Utf8::encoding();
-
-        $utf8Character = mb_convert_encoding(
-            string: $character,
-            to_encoding: $utf8->name(),
-            from_encoding: static::encoding()->name(),
-        );
-
-        $expectedScript = $utf8->charScript($utf8Character);
-
-        static::assertSame($expectedScript, $actualScript);
-    }
-
-    public static function assertCodeCategory(
-        Category $expectedCategory,
-        int $codepoint,
-    ): void {
-        static::assertCharCategory(
-            $expectedCategory,
-            static::encoding()->char($codepoint)
-        );
-    }
-
-    public static function assertCodeDirection(
-        Direction $expectedDirection,
-        int $codepoint,
-    ): void {
-        static::assertCharDirection(
-            $expectedDirection,
-            static::encoding()->char($codepoint)
-        );
-    }
-
-    public static function assertCodeName(
-        string $expectedName,
-        int $codepoint,
-    ): void {
-        static::assertCharName(
-            $expectedName,
-            static::encoding()->char($codepoint)
-        );
-    }
-
-    public static function assertCodeScript(
-        Script $expectedScript,
-        int $codepoint,
-    ): void {
-        static::assertCharScript(
-            $expectedScript,
-            static::encoding()->char($codepoint)
-        );
-    }
-
-    public function testCharCategory(): void
+    /**
+     * @return Generator<int>
+     */
+    public static function codepoints(): Generator
     {
         $encoding = static::encoding();
 
-        foreach ($encoding->chars() as $char) {
-            static::assertCharCategory(
-                $encoding->charCategory($char),
-                $char,
-            );
-        }
-    }
+        $start = max($encoding->minCodepoint() - 1, 0);
+        $end = $encoding->maxCodepoint() + 1;
 
-    public function testCharDirection(): void
-    {
-        $encoding = static::encoding();
-
-        foreach ($encoding->chars() as $char) {
-            static::assertCharDirection(
-                $encoding->charDirection($char),
-                $char,
-            );
-        }
-    }
-
-    public function testCharName(): void
-    {
-        $encoding = static::encoding();
-
-        foreach ($encoding->chars() as $char) {
-            static::assertCharName(
-                $encoding->charName($char),
-                $char,
-            );
-        }
-    }
-
-    public function testCharScript(): void
-    {
-        $encoding = static::encoding();
-
-        foreach ($encoding->chars() as $char) {
-            static::assertCharScript(
-                $encoding->charScript($char),
-                $char,
-            );
+        for ($code = $start; $code < $end; ++$code) {
+            yield $code;
         }
     }
 
@@ -174,11 +37,21 @@ abstract class CharacterEncodingTestCase extends TestCase
     {
         $encoding = static::encoding();
 
-        foreach ($encoding->codes() as $code) {
-            static::assertCodeCategory(
-                $encoding->codeCategory($code),
-                $code,
-            );
+        foreach (static::codepoints() as $codepoint) {
+            if ($encoding->codeIsValid($codepoint)) {
+                $character = $encoding->char($codepoint);
+                $utf8Character = static::convertToUtf8($character);
+
+                $actualCategory = $encoding->codeCategory($codepoint);
+                $expectedCategory = Utf8::encoding()->charCategory($utf8Character);
+
+                static::assertSame($expectedCategory, $actualCategory);
+            } else {
+                static::assertException(
+                    new InvalidCodepoint($encoding, $codepoint),
+                    fn () => $encoding->codeCategory($codepoint),
+                );
+            }
         }
     }
 
@@ -186,11 +59,21 @@ abstract class CharacterEncodingTestCase extends TestCase
     {
         $encoding = static::encoding();
 
-        foreach ($encoding->codes() as $code) {
-            static::assertCodeDirection(
-                $encoding->codeDirection($code),
-                $code,
-            );
+        foreach (static::codepoints() as $codepoint) {
+            if ($encoding->codeIsValid($codepoint)) {
+                $character = $encoding->char($codepoint);
+                $utf8Character = static::convertToUtf8($character);
+
+                $actualDirection = $encoding->codeDirection($codepoint);
+                $expectedDirection = Utf8::encoding()->charDirection($utf8Character);
+
+                static::assertSame($expectedDirection, $actualDirection);
+            } else {
+                static::assertException(
+                    new InvalidCodepoint($encoding, $codepoint),
+                    fn () => $encoding->codeDirection($codepoint),
+                );
+            }
         }
     }
 
@@ -198,11 +81,21 @@ abstract class CharacterEncodingTestCase extends TestCase
     {
         $encoding = static::encoding();
 
-        foreach ($encoding->codes() as $code) {
-            static::assertCodeName(
-                $encoding->codeName($code),
-                $code,
-            );
+        foreach (static::codepoints() as $codepoint) {
+            if ($encoding->codeIsValid($codepoint)) {
+                $character = $encoding->char($codepoint);
+                $utf8Character = static::convertToUtf8($character);
+
+                $actualName = $encoding->codeName($codepoint);
+                $expectedName = Utf8::encoding()->charName($utf8Character);
+
+                static::assertSame($expectedName, $actualName);
+            } else {
+                static::assertException(
+                    new InvalidCodepoint($encoding, $codepoint),
+                    fn () => $encoding->codeName($codepoint),
+                );
+            }
         }
     }
 
@@ -210,11 +103,133 @@ abstract class CharacterEncodingTestCase extends TestCase
     {
         $encoding = static::encoding();
 
-        foreach ($encoding->codes() as $code) {
-            static::assertCodeScript(
-                $encoding->codeScript($code),
-                $code,
-            );
+        foreach (static::codepoints() as $codepoint) {
+            if ($encoding->codeIsValid($codepoint)) {
+                $character = $encoding->char($codepoint);
+                $utf8Character = static::convertToUtf8($character);
+
+                $actualScript = $encoding->codeScript($codepoint);
+                $expectedScript = Utf8::encoding()->charScript($utf8Character);
+
+                static::assertSame($expectedScript, $actualScript);
+            } else {
+                static::assertException(
+                    new InvalidCodepoint($encoding, $codepoint),
+                    fn () => $encoding->codeScript($codepoint),
+                );
+            }
         }
+    }
+
+    /**
+     * @return Generator<string>
+     */
+    abstract public static function characters(): Generator;
+
+    public function testCharCategory(): void
+    {
+        $encoding = static::encoding();
+
+        foreach (static::characters() as $character) {
+            if ($encoding->charIsValid($character)) {
+                $utf8Character = static::convertToUtf8($character);
+
+                $actualCategory = $encoding->charCategory($character);
+                $expectedCategory = Utf8::encoding()->charCategory($utf8Character);
+
+                static::assertSame($expectedCategory, $actualCategory);
+            } else {
+                static::assertException(
+                    new InvalidCharacter($encoding, $character),
+                    fn () => $encoding->charCategory($character),
+                );
+            }
+        }
+    }
+
+    public function testCharDirection(): void
+    {
+        $encoding = static::encoding();
+
+        foreach (static::characters() as $character) {
+            if ($encoding->charIsValid($character)) {
+                $utf8Character = static::convertToUtf8($character);
+
+                $actualDirection = $encoding->charDirection($character);
+                $expectedDirection = Utf8::encoding()->charDirection($utf8Character);
+
+                static::assertSame($expectedDirection, $actualDirection);
+            } else {
+                static::assertException(
+                    new InvalidCharacter($encoding, $character),
+                    fn () => $encoding->charDirection($character),
+                );
+            }
+        }
+    }
+
+    public function testCharName(): void
+    {
+        $encoding = static::encoding();
+
+        foreach (static::characters() as $character) {
+            if ($encoding->charIsValid($character)) {
+                $utf8Character = static::convertToUtf8($character);
+
+                $actualName = $encoding->charName($character);
+                $expectedName = Utf8::encoding()->charName($utf8Character);
+
+                static::assertSame($expectedName, $actualName);
+            } else {
+                static::assertException(
+                    new InvalidCharacter($encoding, $character),
+                    fn () => $encoding->charName($character),
+                );
+            }
+        }
+    }
+
+    public function testCharScript(): void
+    {
+        $encoding = static::encoding();
+
+        foreach (static::characters() as $character) {
+            if ($encoding->charIsValid($character)) {
+                $utf8Character = static::convertToUtf8($character);
+
+                $actualScript = $encoding->charScript($character);
+                $expectedScript = Utf8::encoding()->charScript($utf8Character);
+
+                static::assertSame($expectedScript, $actualScript);
+            } else {
+                static::assertException(
+                    new InvalidCharacter($encoding, $character),
+                    fn () => $encoding->charScript($character),
+                );
+            }
+        }
+    }
+
+    protected static function convertToUtf8(string $character): string
+    {
+        $toEncoding = Utf8::encoding();
+        $fromEncoding = static::encoding();
+
+        if ($toEncoding === $fromEncoding) {
+            return $character;
+        }
+
+        /** @var string|false $utf8Character */
+        $utf8Character = mb_convert_encoding(
+            $character,
+            $toEncoding->name(),
+            $fromEncoding->name(),
+        );
+
+        if ($utf8Character === false) {
+            throw new InvalidCharacter($fromEncoding, $character);
+        }
+
+        return $utf8Character;
     }
 }
