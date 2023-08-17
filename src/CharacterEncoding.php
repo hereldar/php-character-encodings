@@ -9,6 +9,8 @@ use Hereldar\CharacterEncodings\Enums\Category;
 use Hereldar\CharacterEncodings\Enums\CategoryGroup;
 use Hereldar\CharacterEncodings\Enums\Direction;
 use Hereldar\CharacterEncodings\Enums\Script;
+use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
+use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Stringable;
 use UnexpectedValueException;
 
@@ -201,12 +203,7 @@ abstract class CharacterEncoding implements Stringable
      */
     public function charIsControl(string $character): bool
     {
-        return in_array($this->charCategory($character), [
-            Category::ControlChar,
-            Category::FormatChar,
-            Category::LineSeparator,
-            Category::ParagraphSeparator,
-        ], true);
+        return (CategoryGroup::Other === $this->charCategory($character)->group());
     }
 
     /**
@@ -225,6 +222,18 @@ abstract class CharacterEncoding implements Stringable
     public function charIsLetter(string $character): bool
     {
         return (CategoryGroup::Letter === $this->charCategory($character)->group());
+    }
+
+    /**
+     * Returns `true` if the specified character is a letter or
+     * decimal digit; otherwise returns `false`.
+     */
+    public function charIsLetterOrDigit(string $character): bool
+    {
+        $category = $this->charCategory($character);
+
+        return (CategoryGroup::Letter === $category->group())
+            || (Category::DecimalDigitNumber === $category);
     }
 
     /**
@@ -263,7 +272,11 @@ abstract class CharacterEncoding implements Stringable
      */
     public function charIsNull(string $character): bool
     {
-        return $this->codeIsNull($this->code($character));
+        if (!$this->charIsValid($character)) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return ("\0" === $character);
     }
 
     /**
@@ -281,12 +294,7 @@ abstract class CharacterEncoding implements Stringable
      */
     public function charIsPrintable(string $character): bool
     {
-        return !in_array($this->charCategory($character), [
-            Category::ControlChar,
-            Category::FormatChar,
-            Category::LineSeparator,
-            Category::ParagraphSeparator,
-        ], true);
+        return (CategoryGroup::Other !== $this->charCategory($character)->group());
     }
 
     /**
@@ -348,13 +356,19 @@ abstract class CharacterEncoding implements Stringable
      */
     public function charIsVisible(string $character): bool
     {
-        return !in_array($this->charCategory($character), [
-            Category::ControlChar,
-            Category::FormatChar,
-            Category::SpaceSeparator,
-            Category::LineSeparator,
-            Category::ParagraphSeparator,
-        ], true);
+        $category = $this->charCategory($character);
+
+        if (Category::SpaceSeparator === $category
+            || CategoryGroup::Other === $category->group()) {
+            return false;
+        }
+
+        return match ($this->charDirection($character)) {
+            Direction::WhiteSpace,
+            Direction::ParagraphSeparator,
+            Direction::SegmentSeparator => false,
+            default => true,
+        };
     }
 
     /**
@@ -363,7 +377,16 @@ abstract class CharacterEncoding implements Stringable
      */
     public function charIsWhitespace(string $character): bool
     {
-        return $this->codeIsWhitespace($this->code($character));
+        if (Category::SpaceSeparator === $this->charCategory($character)) {
+            return true;
+        }
+
+        return match ($this->charDirection($character)) {
+            Direction::WhiteSpace,
+            Direction::ParagraphSeparator,
+            Direction::SegmentSeparator => true,
+            default => false,
+        };
     }
 
     /**
@@ -394,12 +417,7 @@ abstract class CharacterEncoding implements Stringable
      */
     public function codeIsControl(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::ControlChar,
-            Category::FormatChar,
-            Category::LineSeparator,
-            Category::ParagraphSeparator,
-        ], true);
+        return (CategoryGroup::Other === $this->codeCategory($codepoint)->group());
     }
 
     /**
@@ -418,6 +436,18 @@ abstract class CharacterEncoding implements Stringable
     public function codeIsLetter(int $codepoint): bool
     {
         return (CategoryGroup::Letter === $this->codeCategory($codepoint)->group());
+    }
+
+    /**
+     * Returns `true` if the specified code point is a letter or
+     * decimal digit; otherwise returns `false`.
+     */
+    public function codeIsLetterOrDigit(int $codepoint): bool
+    {
+        $category = $this->codeCategory($codepoint);
+
+        return (CategoryGroup::Letter === $category->group())
+            || (Category::DecimalDigitNumber === $category);
     }
 
     /**
@@ -456,6 +486,10 @@ abstract class CharacterEncoding implements Stringable
      */
     public function codeIsNull(int $codepoint): bool
     {
+        if (!$this->codeIsValid($codepoint)) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
         return (0 === $codepoint);
     }
 
@@ -474,12 +508,7 @@ abstract class CharacterEncoding implements Stringable
      */
     public function codeIsPrintable(int $codepoint): bool
     {
-        return !in_array($this->codeCategory($codepoint), [
-            Category::ControlChar,
-            Category::FormatChar,
-            Category::LineSeparator,
-            Category::ParagraphSeparator,
-        ], true);
+        return (CategoryGroup::Other !== $this->codeCategory($codepoint)->group());
     }
 
     /**
@@ -547,13 +576,19 @@ abstract class CharacterEncoding implements Stringable
      */
     public function codeIsVisible(int $codepoint): bool
     {
-        return in_array($this->codeCategory($codepoint), [
-            Category::ControlChar,
-            Category::FormatChar,
-            Category::SpaceSeparator,
-            Category::LineSeparator,
-            Category::ParagraphSeparator,
-        ], true);
+        $category = $this->codeCategory($codepoint);
+
+        if (Category::SpaceSeparator === $category
+            || CategoryGroup::Other === $category->group()) {
+            return false;
+        }
+
+        return match ($this->codeDirection($codepoint)) {
+            Direction::WhiteSpace,
+            Direction::ParagraphSeparator,
+            Direction::SegmentSeparator => false,
+            default => true,
+        };
     }
 
     /**
@@ -562,13 +597,15 @@ abstract class CharacterEncoding implements Stringable
      */
     public function codeIsWhitespace(int $codepoint): bool
     {
-        if ($this->isAsciiCompatible()) {
-            $ascii = Ascii::encoding();
-            if ($ascii->codeIsValid($codepoint)) {
-                return $ascii->codeIsWhitespace($codepoint);
-            }
+        if (Category::SpaceSeparator === $this->codeCategory($codepoint)) {
+            return true;
         }
 
-        return (Category::SpaceSeparator === $this->codeCategory($codepoint));
+        return match ($this->codeDirection($codepoint)) {
+            Direction::WhiteSpace,
+            Direction::ParagraphSeparator,
+            Direction::SegmentSeparator => true,
+            default => false,
+        };
     }
 }

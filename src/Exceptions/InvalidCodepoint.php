@@ -9,8 +9,8 @@ use UnexpectedValueException;
 
 final class InvalidCodepoint extends UnexpectedValueException
 {
-    private const OUT_OF_BOUND_MESSAGE = "%s uses code points between %X and %X, %X given";
-    private const UNUSED_MESSAGE = "%s does not use the %X code point";
+    private const OUT_OF_BOUND_MESSAGE = "%s uses code points between %02X and %02X, %02X given";
+    private const UNUSED_MESSAGE = "%s does not use the %02X code point";
 
     public function __construct(CharacterEncoding $encoding, int $codepoint)
     {
