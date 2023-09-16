@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Hereldar\CharacterEncodings\Enums;
 
-use IntlChar;
-
 /**
  * @see https://en.wikipedia.org/wiki/Unicode_character_property#Bidirectional_writing
  * @see https://www.unicode.org/reports/tr9/#Bidirectional_Character_Types
@@ -17,73 +15,73 @@ enum Direction: int
     use IntEnumValues;
 
     /** (`AL`) Any strong right-to-left (Arabic-type) character */
-    case ArabicLetter = IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_ARABIC;
+    case ArabicLetter = 13; // IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_ARABIC;
 
     /** (`AN`) Any Arabic-Indic digit */
-    case ArabicNumber = IntlChar::CHAR_DIRECTION_ARABIC_NUMBER;
+    case ArabicNumber = 5; // IntlChar::CHAR_DIRECTION_ARABIC_NUMBER;
 
     /** (`BN`) Most format characters, control codes, or non-characters */
-    case BoundaryNeutral = IntlChar::CHAR_DIRECTION_BOUNDARY_NEUTRAL;
+    case BoundaryNeutral = 18; // IntlChar::CHAR_DIRECTION_BOUNDARY_NEUTRAL;
 
     /** (`CS`) Commas, colons, and slashes */
-    case CommonNumberSeparator = IntlChar::CHAR_DIRECTION_COMMON_NUMBER_SEPARATOR;
+    case CommonNumberSeparator = 6; // IntlChar::CHAR_DIRECTION_COMMON_NUMBER_SEPARATOR;
 
     /** (`EN`) Any ASCII digit or Eastern Arabic-Indic digit */
-    case EuropeanNumber = IntlChar::CHAR_DIRECTION_EUROPEAN_NUMBER;
+    case EuropeanNumber = 2; // IntlChar::CHAR_DIRECTION_EUROPEAN_NUMBER;
 
     /** (`ES`) Plus and minus signs */
-    case EuropeanNumberSeparator = IntlChar::CHAR_DIRECTION_EUROPEAN_NUMBER_SEPARATOR;
+    case EuropeanNumberSeparator = 3; // IntlChar::CHAR_DIRECTION_EUROPEAN_NUMBER_SEPARATOR;
 
     /** (`ET`) A terminator in a numeric format context, includes currency signs */
-    case EuropeanNumberTerminator = IntlChar::CHAR_DIRECTION_EUROPEAN_NUMBER_TERMINATOR;
+    case EuropeanNumberTerminator = 4; // IntlChar::CHAR_DIRECTION_EUROPEAN_NUMBER_TERMINATOR;
 
     /** (`FSI`) U+2068: the first strong isolate control */
-    case FirstStrongIsolate = IntlChar::CHAR_DIRECTION_FIRST_STRONG_ISOLATE;
+    case FirstStrongIsolate = 19; // IntlChar::CHAR_DIRECTION_FIRST_STRONG_ISOLATE;
 
     /** (`L`) Any strong left-to-right character */
-    case LeftToRight = IntlChar::CHAR_DIRECTION_LEFT_TO_RIGHT;
+    case LeftToRight = 0; // IntlChar::CHAR_DIRECTION_LEFT_TO_RIGHT;
 
     /** (`LRE`) U+202A: the LR embedding control */
-    case LeftToRightEmbedding = IntlChar::CHAR_DIRECTION_LEFT_TO_RIGHT_EMBEDDING;
+    case LeftToRightEmbedding = 11; // IntlChar::CHAR_DIRECTION_LEFT_TO_RIGHT_EMBEDDING;
 
     /** (`LRI`) U+2066: the LR isolate control */
-    case LeftToRightIsolate = IntlChar::CHAR_DIRECTION_LEFT_TO_RIGHT_ISOLATE;
+    case LeftToRightIsolate = 20; // IntlChar::CHAR_DIRECTION_LEFT_TO_RIGHT_ISOLATE;
 
     /** (`LRO`) U+202D: the LR override control */
-    case LeftToRightOverride = IntlChar::CHAR_DIRECTION_LEFT_TO_RIGHT_OVERRIDE;
+    case LeftToRightOverride = 12; // IntlChar::CHAR_DIRECTION_LEFT_TO_RIGHT_OVERRIDE;
 
     /** (`NSM`) Any non-spacing mark */
-    case NonSpacingMark = IntlChar::CHAR_DIRECTION_DIR_NON_SPACING_MARK;
+    case NonSpacingMark = 17; // IntlChar::CHAR_DIRECTION_DIR_NON_SPACING_MARK;
 
     /** (`ON`) Most other symbols and punctuation marks */
-    case OtherNeutral = IntlChar::CHAR_DIRECTION_OTHER_NEUTRAL;
+    case OtherNeutral = 10; // IntlChar::CHAR_DIRECTION_OTHER_NEUTRAL;
 
     /** (`B`) Various newline characters */
-    case ParagraphSeparator = IntlChar::CHAR_DIRECTION_BLOCK_SEPARATOR;
+    case ParagraphSeparator = 7; // IntlChar::CHAR_DIRECTION_BLOCK_SEPARATOR;
 
     /** (`PDF`) U+202C: terminates an embedding or override control */
-    case PopDirectionalFormat = IntlChar::CHAR_DIRECTION_POP_DIRECTIONAL_FORMAT;
+    case PopDirectionalFormat = 16; // IntlChar::CHAR_DIRECTION_POP_DIRECTIONAL_FORMAT;
 
     /** (`PDI`) U+2069: terminates an isolate control */
-    case PopDirectionalIsolate = IntlChar::CHAR_DIRECTION_POP_DIRECTIONAL_ISOLATE;
+    case PopDirectionalIsolate = 22; // IntlChar::CHAR_DIRECTION_POP_DIRECTIONAL_ISOLATE;
 
     /** (`R`) Any strong right-to-left (non-Arabic-type) character */
-    case RightToLeft = IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT;
+    case RightToLeft = 1; // IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT;
 
     /** (`RLE`) U+202B: the RL embedding control */
-    case RightToLeftEmbedding = IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_EMBEDDING;
+    case RightToLeftEmbedding = 14; // IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_EMBEDDING;
 
     /** (`RLI`) U+2067: the RL isolate control */
-    case RightToLeftIsolate = IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_ISOLATE;
+    case RightToLeftIsolate = 21; // IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_ISOLATE;
 
     /** (`RLO`) U+202E: the RL override control */
-    case RightToLeftOverride = IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_OVERRIDE;
+    case RightToLeftOverride = 15; // IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_OVERRIDE;
 
     /** (`S`) Various segment-related control codes */
-    case SegmentSeparator = IntlChar::CHAR_DIRECTION_SEGMENT_SEPARATOR;
+    case SegmentSeparator = 8; // IntlChar::CHAR_DIRECTION_SEGMENT_SEPARATOR;
 
     /** (`WS`) Spaces */
-    case WhiteSpace = IntlChar::CHAR_DIRECTION_WHITE_SPACE_NEUTRAL;
+    case WhiteSpace = 9; // IntlChar::CHAR_DIRECTION_WHITE_SPACE_NEUTRAL;
 
     public function code(): string
     {
