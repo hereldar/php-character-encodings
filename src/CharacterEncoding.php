@@ -39,7 +39,7 @@ abstract class CharacterEncoding implements Stringable
     /** @var array<class-string, static> */
     private static array $instances = [];
 
-    private function __construct()
+    protected function __construct()
     {
     }
 
@@ -196,6 +196,15 @@ abstract class CharacterEncoding implements Stringable
      * Returns the script property value for the character.
      */
     abstract public function charScript(string $character): Script;
+
+    /**
+     * Returns `true` if the specified character is part of the 7-bit
+     * ASCII set; otherwise returns `false`.
+     */
+    public function charIsAscii(string $character): bool
+    {
+        return false;
+    }
 
     /**
      * Returns `true` if the specified character is a control
@@ -412,6 +421,15 @@ abstract class CharacterEncoding implements Stringable
     abstract public function codeScript(int $codepoint): Script;
 
     /**
+     * Returns `true` if the specified code point is part of the 7-bit
+     * ASCII set; otherwise returns `false`.
+     */
+    public function codeIsAscii(int $codepoint): bool
+    {
+        return false;
+    }
+
+    /**
      * Returns `true` if the specified code point is a control
      * character; otherwise returns `false`.
      */
@@ -561,13 +579,8 @@ abstract class CharacterEncoding implements Stringable
      */
     public function codeIsValid(int $codepoint): bool
     {
-        try {
-            $character = $this->char($codepoint);
-        } catch (UnexpectedValueException) {
-            return false;
-        }
-
-        return $this->charIsValid($character);
+        return $codepoint >= static::CODEPOINT_MIN
+            && $codepoint <= static::CODEPOINT_MAX;
     }
 
     /**

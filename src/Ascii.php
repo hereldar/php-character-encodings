@@ -19,14 +19,16 @@ use Hereldar\CharacterEncodings\Indexes\AsciiCodeDirections;
 use Hereldar\CharacterEncodings\Indexes\AsciiCodeNames;
 use Hereldar\CharacterEncodings\Indexes\AsciiCodeScripts;
 use Hereldar\CharacterEncodings\Traits\IsAsciiCompatible;
+use Hereldar\CharacterEncodings\Traits\IsFinal;
 use Hereldar\CharacterEncodings\Traits\IsSingleByte;
 
 /**
  * @see https://en.wikipedia.org/wiki/ASCII
  */
-class Ascii extends CharacterEncoding
+final class Ascii extends CharacterEncoding
 {
     use IsAsciiCompatible;
+    use IsFinal;
     use IsSingleByte;
 
     public const NAME = 'ASCII';
@@ -78,15 +80,17 @@ class Ascii extends CharacterEncoding
     public const SYMBOLS
         = "\x24\x2B\x3C\x3D\x3E\x5E\x60\x7C\x7E";
 
-    // SP, HT, CR, LF, VT, FF, FS, GS, RS, US
-    public const WHITESPACES
-        = "\x20\x09\x0D\x0A\x0B\x0C\x1C\x1D\x1E\x1F";
+    public const SEPARATORS = "\x20";
 
     public const VISIBLE
         = self::LETTERS . self::NUMBERS . self::PUNCTUATION . self::SYMBOLS;
 
     public const PRINTABLE
-        = self::VISIBLE . "\x20";
+        = self::VISIBLE . self::SEPARATORS;
+
+    // SP, HT, CR, LF, VT, FF, FS, GS, RS, US
+    public const WHITESPACES
+        = "\x20\x09\x0D\x0A\x0B\x0C\x1C\x1D\x1E\x1F";
 
     public function chars(): Generator
     {
@@ -122,78 +126,190 @@ class Ascii extends CharacterEncoding
 
     public function charIsControl(string $character): bool
     {
-        return str_contains(static::CONTROL, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::CONTROL, $character);
     }
 
     public function charIsDigit(string $character): bool
     {
-        return str_contains(static::DIGITS, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::DIGITS, $character);
+    }
+
+    public function charIsHexDigit(string $character): bool
+    {
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::HEXDIGITS, $character);
+    }
+
+    public function charIsOctDigit(string $character): bool
+    {
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::OCTDIGITS, $character);
     }
 
     public function charIsLetter(string $character): bool
     {
-        return str_contains(static::LETTERS, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::LETTERS, $character);
+    }
+
+    public function charIsLetterOrDigit(string $character): bool
+    {
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::LETTERS, $character)
+            || str_contains(self::DIGITS, $character);
     }
 
     public function charIsLetterOrNumber(string $character): bool
     {
-        return str_contains(static::LETTERS, $character)
-            || str_contains(static::NUMBERS, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::LETTERS, $character)
+            || str_contains(self::NUMBERS, $character);
     }
 
     public function charIsLower(string $character): bool
     {
-        return str_contains(static::LOWERCASE, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::LOWERCASE, $character);
     }
 
     public function charIsMark(string $character): bool
     {
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
         return false;
     }
 
     public function charIsNumber(string $character): bool
     {
-        return str_contains(static::NUMBERS, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::NUMBERS, $character);
     }
 
     public function charIsPrintable(string $character): bool
     {
-        return str_contains(static::PRINTABLE, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::PRINTABLE, $character);
     }
 
     public function charIsPunctuation(string $character): bool
     {
-        return str_contains(static::PUNCTUATION, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::PUNCTUATION, $character);
     }
 
     public function charIsSeparator(string $character): bool
     {
-        return ($character === ' ');
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::SEPARATORS, $character);
     }
 
     public function charIsSymbol(string $character): bool
     {
-        return str_contains(static::SYMBOLS, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::SYMBOLS, $character);
     }
 
     public function charIsTitle(string $character): bool
     {
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
         return false;
     }
 
     public function charIsUpper(string $character): bool
     {
-        return str_contains(static::UPPERCASE, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::UPPERCASE, $character);
+    }
+
+    public function charIsValid(string $character): bool
+    {
+        return (strlen($character) === 1)
+            && (ord($character) <= self::CODEPOINT_MAX);
     }
 
     public function charIsVisible(string $character): bool
     {
-        return str_contains(static::VISIBLE, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::VISIBLE, $character);
     }
 
     public function charIsWhitespace(string $character): bool
     {
-        return str_contains(static::WHITESPACES, $character);
+        if (strlen($character) !== 1
+            || ord($character) > self::CODEPOINT_MAX) {
+            throw new InvalidCharacter($this, $character);
+        }
+
+        return str_contains(self::WHITESPACES, $character);
     }
 
     public function charName(string $character): string
@@ -248,5 +364,178 @@ class Ascii extends CharacterEncoding
         }
 
         return AsciiCodeScripts::INDEX[$codepoint];
+    }
+
+    public function codeIsControl(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::CONTROL, chr($codepoint));
+    }
+
+    public function codeIsDigit(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::DIGITS, chr($codepoint));
+    }
+
+    public function codeIsHexDigit(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::HEXDIGITS, chr($codepoint));
+    }
+
+    public function codeIsOctDigit(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::OCTDIGITS, chr($codepoint));
+    }
+
+    public function codeIsLetter(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::LETTERS, chr($codepoint));
+    }
+
+    public function codeIsLetterOrNumber(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        $character = chr($codepoint);
+
+        return str_contains(self::LETTERS, $character)
+            || str_contains(self::NUMBERS, $character);
+    }
+
+    public function codeIsLower(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::LOWERCASE, chr($codepoint));
+    }
+
+    public function codeIsMark(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return false;
+    }
+
+    public function codeIsNumber(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::NUMBERS, chr($codepoint));
+    }
+
+    public function codeIsPrintable(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::PRINTABLE, chr($codepoint));
+    }
+
+    public function codeIsPunctuation(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::PUNCTUATION, chr($codepoint));
+    }
+
+    public function codeIsSeparator(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::SEPARATORS, chr($codepoint));
+    }
+
+    public function codeIsSymbol(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::SYMBOLS, chr($codepoint));
+    }
+
+    public function codeIsTitle(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return false;
+    }
+
+    public function codeIsUpper(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::UPPERCASE, chr($codepoint));
+    }
+
+    public function codeIsVisible(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::VISIBLE, chr($codepoint));
+    }
+
+    public function codeIsWhitespace(int $codepoint): bool
+    {
+        if ($codepoint < self::CODEPOINT_MIN
+            || $codepoint > self::CODEPOINT_MAX) {
+            throw new InvalidCodepoint($this, $codepoint);
+        }
+
+        return str_contains(self::WHITESPACES, chr($codepoint));
     }
 }

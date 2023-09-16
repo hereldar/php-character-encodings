@@ -11,6 +11,7 @@ use Hereldar\CharacterEncodings\Enums\Script;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCharacter;
 use Hereldar\CharacterEncodings\Exceptions\InvalidCodepoint;
 use Hereldar\CharacterEncodings\Traits\IsAsciiCompatible;
+use Hereldar\CharacterEncodings\Traits\IsFinal;
 use Hereldar\CharacterEncodings\Traits\IsSelfSynchronized;
 use Hereldar\CharacterEncodings\Traits\IsUnicode;
 use Hereldar\CharacterEncodings\Traits\IsVariableWidth;
@@ -22,9 +23,10 @@ use IntlChar;
  * @see https://doc.qt.io/qt-6/qchar.html#public-types
  * @see https://doc.qt.io/qt-6/qstring.html#public-types
  */
-class Utf8 extends CharacterEncoding
+final class Utf8 extends CharacterEncoding
 {
     use IsAsciiCompatible;
+    use IsFinal;
     use IsSelfSynchronized;
     use IsUnicode;
     use IsVariableWidth;

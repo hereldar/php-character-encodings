@@ -238,8 +238,8 @@ abstract class CharacterEncodingTestCase extends TestCase
     {
         $encoding = static::encoding();
 
-        $start = max($encoding->minCodepoint() - 1, 0);
-        $end = $encoding->maxCodepoint() + 1;
+        $start = max($encoding->minCodepoint() - 3, 0);
+        $end = $encoding->maxCodepoint() + 3;
 
         for ($code = $start; $code < $end; ++$code) {
             yield $code;

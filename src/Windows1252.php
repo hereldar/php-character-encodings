@@ -19,14 +19,16 @@ use Hereldar\CharacterEncodings\Indexes\Windows1252CodeDirections;
 use Hereldar\CharacterEncodings\Indexes\Windows1252CodeNames;
 use Hereldar\CharacterEncodings\Indexes\Windows1252CodeScripts;
 use Hereldar\CharacterEncodings\Traits\IsAsciiCompatible;
+use Hereldar\CharacterEncodings\Traits\IsFinal;
 use Hereldar\CharacterEncodings\Traits\IsSingleByte;
 
 /**
  * @see https://en.wikipedia.org/wiki/Windows-1252
  */
-class Windows1252 extends CharacterEncoding
+final class Windows1252 extends CharacterEncoding
 {
     use IsAsciiCompatible;
+    use IsFinal;
     use IsSingleByte;
 
     public const NAME = 'Windows-1252';
@@ -118,5 +120,10 @@ class Windows1252 extends CharacterEncoding
         }
 
         return Windows1252CodeScripts::INDEX[$codepoint];
+    }
+
+    public function charIsValid(string $character): bool
+    {
+        return (strlen($character) === 1);
     }
 }
